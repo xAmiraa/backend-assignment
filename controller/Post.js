@@ -3,7 +3,7 @@ const router = express.Router();
 const fetch = require("node-fetch");
 const sortArray = require("sort-array");
 const cachePosts = require("../routeCache");
-const api = "http://localhost:3000/api/posts?tag=history&sortBy=likes";
+
 fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
   .then((response) => response.json())
   .then((data) => {
@@ -12,51 +12,52 @@ fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
       const tags = request.query.tag;
       const sort = request.query.sortBy;
       const direction = request.query.direction;
-      console.log("tags is", tags);
-      let tgs = tags.split(",");
+      var arrayOfSortedKey = ["id", "reads", "likes", "popularity"];
+      var arrayofDirections = ["asc", "desc"];
+      var result;
+      if (tags) {
+        if (tags.search(",") != -1) {
+          var allTas = tags.split(",");
 
-      if (!tags) {
-        return response
-          .status(400)
-          .json({ error: "Tags parameter is required" })
-          .end();
-      } else {
-        var dataFilterdByTechTag = data.posts.filter((post) => {
-          return post.tags.find((tagPost) => {
-            return tgs.find((t) => {
-              return tagPost === t;
-            });
+          console.log(allTas, "tags");
+          var filterdPosts = data.posts.filter((item) => {
+            for (let i = 0; i < allTas.length; i++) {
+              if (item.tags.includes(allTas[i])) return item;
+            }
           });
-        });
-        console.log(sort);
-        if (sort) {
-          if (
-            direction === "asc" ||
-            direction === "desc" ||
-            direction === undefined
-          ) {
-            console.log("INSIDE SORT");
-            var sortedByReads = sortArray(dataFilterdByTechTag, {
-              by:
-                sort === "popularity" || sort === "reads" || sort === "likes"
-                  ? sort
-                  : "id",
-              order: direction,
-            });
-            return response.status(200).json({ posts: sortedByReads });
-          } else {
-            return response
-              .status(400)
-              .json({ error: "sortBy parameter is invalid" })
-              .end();
-          }
+
+          var sortedArray = sortArray(filterdPosts, {
+            by: arrayOfSortedKey.includes(sort) ? sort : "id",
+            order: direction,
+          });
+          result = sortedArray;
+        } else {
+          var filterdBySingleTag = data.posts.filter((item) => {
+            if (item.tags.includes(tags)) return item;
+          });
+          result = filterdBySingleTag;
         }
+
+        if (
+          (arrayOfSortedKey.includes(sort) || sort === undefined) &&
+          (arrayofDirections.includes(direction) || direction === undefined)
+        ) {
+          var sortedArray = sortArray(result, {
+            by: sort,
+            order: direction,
+          });
+          response.status(200).json({ posts: sortedArray });
+        } else {
+          response.json({
+            error: "sortBy parameter is invalid",
+          });
+        }
+      } else {
+        response.status(400).json({ error: "Tags parameter is required" });
       }
     });
   });
-router.get("/tags", cachePosts(300), (req, res) => {
-  res.send(["Hello"]);
-});
+
 router.get("/api/ping", cachePosts(300), (request, response) => {
   return response.status(200).json({
     success: true,
