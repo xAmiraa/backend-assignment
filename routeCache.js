@@ -10,10 +10,10 @@ module.exports = (duration) => (req, res, next) => {
   console.log(key);
   const cachedResponse = cache.get(key);
   if (cachedResponse) {
-    console.log(`cache hit fo0r key ${key}`);
+    console.log(`cached hit for key ${key}`);
     res.send(cachedResponse);
   } else {
-    console.log(`cache miss for key ${key}`);
+    console.log(`cached miss for key ${key}`);
     res.originalSend = res.send;
     res.send = (body) => {
       res.originalSend(body);

@@ -30,7 +30,6 @@ fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
         });
         console.log(sort);
         if (sort) {
-          console.log(direction);
           if (
             direction === "asc" ||
             direction === "desc" ||
