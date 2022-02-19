@@ -8,18 +8,15 @@ fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
   .then((response) => response.json())
   .then((data) => {
     router.get("/api/posts", cachePosts(300), (request, response) => {
-      console.log(request.originalUrl);
       const tags = request.query.tag;
       const sort = request.query.sortBy;
       const direction = request.query.direction;
-      var arrayOfSortedKey = ["id", "reads", "likes", "popularity"];
-      var arrayofDirections = ["asc", "desc"];
+      const arrayOfSortedKey = ["id", "reads", "likes", "popularity"];
+      const arrayofDirections = ["asc", "desc"];
       var result;
       if (tags) {
         if (tags.search(",") != -1) {
           var allTas = tags.split(",");
-
-          console.log(allTas, "tags");
           var filterdPosts = data.posts.filter((item) => {
             for (let i = 0; i < allTas.length; i++) {
               if (item.tags.includes(allTas[i])) return item;
