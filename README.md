@@ -1,12 +1,21 @@
 # backend-assignment
 To run the server you should run this command on path of nodejs folder
 
-node app
+node app.js
 To test apis (Bouns point)
-npm test
+Write this command in terminal
+But note:you will check if node js server is
+Running or not 
+If it is running, you should stop it
+And run this command :
+npm test 
 
 To test caching server (Bouns point)
-you will check the network tap on console you will show the last time you make request it's time less than first time request and you can check test file
+you will check the network tap
+on console you will show the last
+time you make request it's time less 
+than first time request and you can 
+check test file
 and watch the terminal
 
 First Route:
