@@ -2,10 +2,13 @@ const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
 const sortArray = require("sort-array");
+const cachePosts = require("../routeCache");
+const api = "http://localhost:3000/api/posts?tag=history&sortBy=likes";
 fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
   .then((response) => response.json())
   .then((data) => {
-    router.get("/api/posts", (request, response) => {
+    router.get("/api/posts", cachePosts(300), (request, response) => {
+      console.log(request.originalUrl);
       const tags = request.query.tag;
       const sort = request.query.sortBy;
       const direction = request.query.direction;
@@ -41,7 +44,7 @@ fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
                   : "id",
               order: direction,
             });
-            return response.status(200).json({ posts: sortedByReads }).end();
+            return response.status(200).json({ posts: sortedByReads });
           } else {
             return response
               .status(400)
@@ -52,16 +55,13 @@ fetch("https://api.hatchways.io/assessment/blog/posts?tag=tech")
       }
     });
   });
-router.get("/tags", (req, res) => {
+router.get("/tags", cachePosts(300), (req, res) => {
   res.send(["Hello"]);
 });
-router.get("/api/ping", (request, response) => {
-  return response
-    .status(200)
-    .json({
-      success: true,
-    })
-    .end();
+router.get("/api/ping", cachePosts(300), (request, response) => {
+  return response.status(200).json({
+    success: true,
+  });
 });
 
 module.exports = router;
